@@ -1,0 +1,59 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1f4d"><meta name="robots" content="noindex,nofollow"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" sizes="180x180" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><title>مسؤول التفعيل - أكرو</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:linear-gradient(160deg,#0a1f4d,#1565c0);min-height:100vh;color:#fff;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.w{max-width:480px;margin:0 auto}
+h1{font-size:22px;text-align:center;margin:8px 0 4px}
+.sub{text-align:center;opacity:.8;font-size:14px;margin-bottom:18px}
+.card{background:#fff;color:#0a1f4d;border-radius:16px;padding:16px;margin-bottom:14px}
+label{display:block;font-weight:700;margin-bottom:6px}
+textarea,input{width:100%;font:inherit;font-size:18px;padding:12px;border:2px solid #cfd8ea;border-radius:12px;color:#0a1f4d;background:#fff}
+textarea{min-height:90px;resize:vertical}
+button{font:inherit;font-weight:700;font-size:17px;border:0;border-radius:12px;padding:13px 16px;cursor:pointer;width:100%;margin-top:10px;background:#1565c0;color:#fff}
+button.g{background:#1faa59}button.w2{background:#e9eef9;color:#0a1f4d}button.r{background:#fbe9e9;color:#b3261e}
+.det{margin-top:10px;font-size:15px;color:#33436b}
+.code{font-size:44px;font-weight:800;letter-spacing:4px;text-align:center;direction:ltr;margin:6px 0;color:#0a1f4d}
+.ph{text-align:center;font-size:16px;color:#33436b}
+.msg{color:#b3261e;margin-top:8px;font-size:15px;min-height:18px}
+.h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #e3e9f5}
+.h:last-child{border:0}.h b{direction:ltr;unicode-bidi:embed}
+.h button{width:auto;margin:0;padding:8px 12px;font-size:14px}
+[hidden]{display:none!important}
+</style></head><body><div class="w">
+<div id="lock" hidden><h1>مسؤول التفعيل</h1><div class="sub" id="lsub"></div>
+<div class="card"><label id="llab">الرقم السري</label><input id="pin" type="password" inputmode="numeric" autocomplete="off"><button id="lgo">دخول</button><div class="msg" id="lmsg"></div></div></div>
+<div id="app" hidden><h1>مسؤول التفعيل</h1><div class="sub">اكتب رقم العميل أو الصق رسالة طلب التفعيل كلها</div>
+<div class="card"><label for="inp">رقم التليفون أو رسالة الطلب</label><textarea id="inp" placeholder="مثال: 01012345678"></textarea><div class="det" id="det"></div><button id="mk">اعمل الكود</button><div class="msg" id="mm"></div></div>
+<div class="card" id="res" hidden><div class="ph" id="rph"></div><div class="code" id="rc"></div><button class="g" id="rwa">ابعت الكود للعميل واتساب</button><button class="w2" id="rcp">نسخ الكود</button></div>
+<div class="card" id="hc" hidden><label>آخر الأكواد</label><div id="hl"></div><button class="r" id="hclr">مسح السجل</button></div></div></div>
+<script>
+const APP_URL='https://karem191978-maker.github.io/acrow-extra/';
+/*CORE*/
+const SECRET='3ecde1e933b1';
+const h53=(s,seed=0)=>{let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,c;i<s.length;i++){c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)};
+const nd=x=>String(x).replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776);
+const dg=x=>nd(x).replace(/\D/g,''),chk=(p,sr)=>String(h53(p+'|'+sr+'|'+SECRET)%10000).padStart(4,'0'),phk=x=>{x=dg(x);return x.length>=10?x.slice(-10):''};
+function findPhone(t){const d=nd(t).replace(/[\s\-]/g,'');const m=d.match(/(?:\+?20|0020)?0?(1[0125]\d{8})/);return m?m[1]:phk(t)}
+function findName(t){const m=nd(t).match(/الاسم\s*[:：]\s*([^\n\r]+)/);return m?m[1].trim():''}
+function makeCode(p){const sr=String(h53(p+'|serial|'+SECRET)%10000).padStart(4,'0');return sr+chk(p,sr)}
+/*ENDCORE*/
+const $=s=>document.querySelector(s);
+const fmt=c=>c.slice(0,4)+'-'+c.slice(4);
+let cur=null;
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function hist(){try{return JSON.parse(ls('acrowAdmHist')||'[]')}catch(e){return[]}}
+function saveHist(h){ls('acrowAdmHist',JSON.stringify(h.slice(0,40)))}
+function showLock(){const has=!!ls('acrowAdmPin');$('#lock').hidden=false;$('#app').hidden=true;$('#lsub').textContent=has?'اكتب الرقم السري':'أول مرة: اعمل رقم سري للمسؤول (4 أرقام أو أكتر)';$('#lgo').textContent=has?'دخول':'حفظ الرقم السري';$('#pin').value='';$('#lmsg').textContent=''}
+$('#lgo').onclick=()=>{const p=dg($('#pin').value);if(p.length<4)return $('#lmsg').textContent='الرقم السري لازم يكون 4 أرقام على الأقل.';const hp=String(h53(p+'|adm'));const sv=ls('acrowAdmPin');if(!sv){ls('acrowAdmPin',hp);openApp()}else if(sv===hp)openApp();else $('#lmsg').textContent='الرقم السري غلط.'};
+$('#pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgo').click()});
+function openApp(){$('#lock').hidden=true;$('#app').hidden=false;renderHist()}
+$('#inp').addEventListener('input',()=>{const t=$('#inp').value;const p=findPhone(t),n=findName(t);$('#det').textContent=p?('الرقم: 0'+p+(n?' — الاسم: '+n:'')):'';$('#mm').textContent=''});
+$('#mk').onclick=()=>{const t=$('#inp').value;const p=findPhone(t);if(!p||p.length!==10)return $('#mm').textContent='مش لاقي رقم تليفون صحيح (11 رقم).';const n=findName(t);const code=makeCode(p);cur={p,n,code};show();const h=hist().filter(x=>x.p!==p);h.unshift({p,n,t:Date.now()});saveHist(h);renderHist()};
+function show(){$('#res').hidden=false;$('#rph').textContent='كود تفعيل الرقم 0'+cur.p+(cur.n?' ('+cur.n+')':'');$('#rc').textContent=fmt(cur.code);$('#res').scrollIntoView({behavior:'smooth'})}
+$('#rwa').onclick=()=>{const wn='20'+cur.p;const txt=(cur.n?'أهلاً '+cur.n+'\n':'')+'كود تفعيل برنامج احتساب الإضافي:\n'+fmt(cur.code)+'\nاكتبه في خانة الكود واضغط تفعيل.\nرابط البرنامج: '+APP_URL;window.open('https://wa.me/'+wn+'?text='+encodeURIComponent(txt),'_blank')};
+$('#rcp').onclick=async()=>{try{await navigator.clipboard.writeText(fmt(cur.code));$('#rcp').textContent='تم النسخ ✓'}catch(e){$('#rcp').textContent='انسخه بإيدك: '+fmt(cur.code)}setTimeout(()=>$('#rcp').textContent='نسخ الكود',2000)};
+function renderHist(){const h=hist();$('#hc').hidden=!h.length;$('#hl').innerHTML='';h.forEach(x=>{const d=document.createElement('div');d.className='h';const s=document.createElement('span');s.textContent=(x.n?x.n+' — ':'')+'0'+x.p;const b=document.createElement('button');b.className='w2';b.textContent='الكود';b.onclick=()=>{cur={p:x.p,n:x.n||'',code:makeCode(x.p)};show()};d.append(s,b);$('#hl').append(d)})}
+$('#hclr').onclick=()=>{if(confirm('تمسح سجل الأكواد؟ (الأكواد نفسها ممكن تتعمل تاني بنفس الرقم)')){saveHist([]);renderHist()}};
+showLock();
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0){navigator.serviceWorker.register('sw.js').then(r=>r.update().catch(()=>{})).catch(()=>{})}
+</script></body></html>

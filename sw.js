@@ -1,6 +1,6 @@
 // كشف الإضافي - Service Worker (نسخة مضبوطة للعمل بدون نت)
 // لو عدلت أي ملف في التطبيق: غيّر رقم VERSION بس.
-const VERSION = 'v10';
+const VERSION = 'v12';
 const CACHE = 'extra-calc-pwa-' + VERSION;
 const INDEX = './index.html';
 const OPTIONAL = ['./manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-192.png', './icon-maskable-512.png'];
@@ -35,6 +35,7 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.indexOf('/m-7k3q9x/') !== -1) return; // صفحة المسؤول لها Service Worker لوحدها
 
   // فتح التطبيق (من الأيقونة أو الرابط): دايماً من الكاش فوراً، حتى لو النت واقع أو ضعيف
   if (req.mode === 'navigate') {
